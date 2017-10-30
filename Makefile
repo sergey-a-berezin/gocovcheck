@@ -15,7 +15,19 @@
 ROOT := $(shell source ./common.sh; echo "$${ROOT}")
 
 all:
-	@echo "Nothing to do. Pick a specific target."
+	@echo "Please pick a target:"
+	@echo "  make build    - compile (but do not install) the package"
+	@echo "  make install  - compile and install gocovcheck executable"
+	@echo "  make init     - initialize the development environment"
+	@echo "  make test     - run tests"
+	@echo "  make clean    - delete object files and other temporary files"
+	@echo "  make pristine - clean + delete everything created by bootstrap"
+
+install:
+	go install
+
+build:
+	go build
 
 test:
 	./runtests
