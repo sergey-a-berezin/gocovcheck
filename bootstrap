@@ -1,0 +1,120 @@
+#!/bin/bash
+
+# Copyright 2017 Sergey Berezin
+
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#     http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Stop the script on the first error.
+trap 'bootstrap failed on line ${LINENO}"; exit 1' ERR
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source "${DIR}/common.sh"
+
+echo "Current dir: ${DIR}"
+echo "Root dir: ${ROOT}"
+
+# Bootstrap glide - the tool that bootstraps all the other dependencies.
+GLIDE_DIR="${ROOT}/src/vendor/github.com/Masterminds/glide"
+# For now, pin it here. Current pin: v0.13.0.
+GLIDE_SHA1="a88a9a6c4eeaac084a90a0cd2ca8a148cbd3ff63"
+
+# Automatically build and install these packages
+AUTOINSTALL_PACKAGES=( \
+    "vendor/github.com/smartystreets/goconvey" \
+    "vendor/github.com/golang/lint/golint" \
+    "github.com/sergey-a-berezin/gocovcheck" \
+    "github.com/sergey-a-berezin/gocovcheck/jsonread" \
+)
+
+if ! which go > /dev/null; then
+    echo "  WARNING: Couldn't find Go installation."
+    echo "  Please download & install Go at https://golang.org/dl/"
+    exit 1
+fi
+
+mkdir -p "${ROOT}/bin" "${ROOT}/pkg"
+ln -s "${DIR}/glide.yaml" "${ROOT}/glide.yaml"
+ln -s "${DIR}/glide.lock" "${ROOT}/glide.lock"
+
+# Create bin/activate for Go environment, similar to Python's virtualenv.
+cat <<EOF > "${ROOT}/bin/activate"
+deactivate () {
+    if [ -n "\$_OLD_GOENV_GOPATH" ]; then
+	if [ "\$_OLD_GOENV_GOPATH" = "unset" ]; then
+	    unset GOPATH
+	else
+	    GOPATH="\$_OLD_GOENV_GOPATH"
+	    export GOPATH
+	fi
+        unset _OLD_GOENV_GOPATH
+    fi
+    if [ -n "\$_OLD_GOENV_PATH" ]; then
+	PATH="\$_OLD_GOENV_PATH"
+	export PATH
+	unset _OLD_GOENV_PATH
+    fi
+    # Restore shell prompt
+    if [ -n "\$_OLD_GOENV_PS1" ]; then
+	PS1="\$_OLD_GOENV_PS1"
+	export PS1
+	unset _OLD_GOENV_PS1
+    fi
+    if [ ! "\$1" = "nondestructive" ] ; then
+	# Self destruct!
+        unset -f deactivate
+    fi
+}
+
+if [ -n "\$GOPATH" ]; then
+    _OLD_GOENV_GOPATH="\$GOPATH"
+else
+    _OLD_GOENV_GOPATH="unset"
+fi
+export _OLD_GOENV_GOPATH
+_OLD_GOENV_PATH="\$PATH"
+export _OLD_GOENV_PATH
+_OLD_GOENV_PS1="\$PS1"
+export _OLD_GOENV_PS1
+
+GOPATH="$ROOT"
+export GOPATH
+PATH="$ROOT/bin":"\$PATH"
+export PATH
+PS1="(go) \$PS1"
+export PS1
+EOF
+
+# Bootstrap glide
+if [ ! -d "$GLIDE_DIR" ]; then
+    mkdir -p "$GLIDE_DIR"
+    git clone https://github.com/Masterminds/glide.git "$GLIDE_DIR"
+else
+    echo "Found $GLIDE_DIR."
+    echo "If glide compilation fails, try deleting the above folder and try 'make init' again."
+fi
+(source "${ROOT}/bin/activate"; cd "$GLIDE_DIR"; git fetch; git checkout "$GLIDE_SHA1"; make build) \
+    && mv "${GLIDE_DIR}/glide" "${ROOT}/bin"
+
+if [ "$?" != 0 ]; then
+    echo "Glide compilation failed. Try deleting $GLIDE_DIR and try again."
+    exit 1
+fi
+
+# Bootstrap all the other dependencies
+(source "${ROOT}/bin/activate"; cd "${ROOT}/src"; glide install)
+
+# Compile and install some packages
+for p in "${AUTOINSTALL_PACKAGES[@]}"; do
+    echo "Installing ${p}..."
+    (source "${ROOT}/bin/activate"; go install "${p}")
+done

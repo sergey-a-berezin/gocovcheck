@@ -1,0 +1,25 @@
+hash: c196cbb418249940fbc2f260b7147eb9595d70de16581993d9ada9513de8aa17
+updated: 2017-10-29T16:51:44.142870516-07:00
+imports:
+- name: github.com/golang/lint
+  version: c7bacac2b21ca01afa1dee0acf64df3ce047c28f
+  subpackages:
+  - golint
+testImports:
+- name: github.com/gopherjs/gopherjs
+  version: f2fc182abb28925c7aa40502db839c6ebd7f7171
+  subpackages:
+  - js
+- name: github.com/jtolds/gls
+  version: 8ddce2a84170772b95dd5d576c48d517b22cac63
+- name: github.com/smartystreets/assertions
+  version: 2063fd1cc7c975db70502811a34b06ad034ccdf2
+  subpackages:
+  - internal/go-render/render
+  - internal/oglematchers
+- name: github.com/smartystreets/goconvey
+  version: 5db88ed452e937f2fd557de6f4f1af7f2eabed0b
+  subpackages:
+  - convey
+  - convey/gotest
+  - convey/reporting
