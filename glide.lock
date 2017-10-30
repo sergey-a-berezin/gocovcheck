@@ -1,10 +1,14 @@
-hash: c196cbb418249940fbc2f260b7147eb9595d70de16581993d9ada9513de8aa17
-updated: 2017-10-29T16:51:44.142870516-07:00
+hash: 40ed37d11f81bed42218becc0fd515b5f8ace4d8c2036c8c807ee73ef63db939
+updated: 2017-10-29T17:32:17.818948373-07:00
 imports:
 - name: github.com/golang/lint
   version: c7bacac2b21ca01afa1dee0acf64df3ce047c28f
   subpackages:
   - golint
+- name: golang.org/x/tools
+  version: f1a397bba50dee815e8c73f3ec94ffc0e8df1a09
+  subpackages:
+  - go/gcimporter15
 testImports:
 - name: github.com/gopherjs/gopherjs
   version: f2fc182abb28925c7aa40502db839c6ebd7f7171

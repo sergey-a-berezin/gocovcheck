@@ -43,8 +43,10 @@ if ! which go > /dev/null; then
 fi
 
 mkdir -p "${ROOT}/bin" "${ROOT}/pkg"
-ln -s "${DIR}/glide.yaml" "${ROOT}/glide.yaml"
-ln -s "${DIR}/glide.lock" "${ROOT}/glide.lock"
+
+rm -f "${ROOT}/src/glide.yaml" "${ROOT}/src/glide.lock"
+ln -s "${DIR}/glide.yaml" "${ROOT}/src/glide.yaml"
+ln -s "${DIR}/glide.lock" "${ROOT}/src/glide.lock"
 
 # Create bin/activate for Go environment, similar to Python's virtualenv.
 cat <<EOF > "${ROOT}/bin/activate"

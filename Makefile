@@ -18,7 +18,7 @@ all:
 	@echo "Nothing to do. Pick a specific target."
 
 test:
-	./runtest
+	./runtests
 
 init:
 	./bootstrap
@@ -29,4 +29,4 @@ clean:
 
 pristine: clean
 	rm -rf "$(ROOT)/bin" "$(ROOT)/src/vendor"
-	rm -f "$(ROOT)"/src/glide.{yaml,lock}
+	rm -f "$(ROOT)/src/glide.yaml" "$(ROOT)/src/glide.lock"
