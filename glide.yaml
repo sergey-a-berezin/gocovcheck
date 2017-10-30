@@ -1,0 +1,12 @@
+package: .
+import:
+- package: github.com/golang/lint
+  subpackages:
+  - golint
+- package: golang.org/x/tools
+  subpackages:
+  - go/gcimporter15
+testImport:
+- package: github.com/smartystreets/goconvey
+  subpackages:
+  - convey

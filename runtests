@@ -1,0 +1,78 @@
+#!/bin/bash
+
+# Copyright 2017 Sergey Berezin
+
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#     http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source "${DIR}/common.sh"
+
+cd "${ROOT}/src"
+
+source "${ROOT}/bin/activate"
+
+COVERAGE_PROFILE=".coverage"
+COVERAGERC=".coveragerc"
+MIN_COVERAGE=75
+
+tests_failed=()
+coverage_low=()
+rm -f "$COVERAGE_PROFILE"
+for path in $(glide novendor); do
+    for pkg in $(go list "$path"); do
+	if ! go test -coverprofile "${COVERAGE_PROFILE}_tmp" "$pkg"; then
+	    tests_failed=("${tests_failed[@]}" "$pkg")
+	fi
+	if [ -f "${pkg}/${COVERAGERC}" ]; then
+	    min_coverage=`jsonread "${pkg}/${COVERAGERC}" min_coverage "$MIN_COVERAGE"`
+	else
+	    min_coverage="$MIN_COVERAGE"
+	fi
+	if [ -f "${COVERAGE_PROFILE}_tmp" ]; then
+	    if ! gocovcheck "${COVERAGE_PROFILE}_tmp" "$min_coverage"; then
+		coverage_low=("${coverage_low[@]}" "$pkg")
+	    fi
+	    cat "${COVERAGE_PROFILE}_tmp" >> "$COVERAGE_PROFILE"
+	    rm -f "${COVERAGE_PROFILE}_tmp"
+	fi
+    done
+done
+
+if [ -f "$COVERAGE_PROFILE" ]; then
+    echo "Overall coverage:"
+    if ! gocovcheck "$COVERAGE_PROFILE" "$MIN_COVERAGE"; then
+	coverage_low=("${coverage_low[@]}" "Average across all packages")
+    fi
+fi
+go vet $(glide novendor)
+golint $(glide novendor)
+
+exit_code=0
+
+if [ ${#tests_failed[@]} -ne 0 ]; then
+    echo "Tests failed in packages:"
+    for pkg in "${tests_failed[@]}"; do
+	echo "  $pkg"
+    done
+    exit_code=1
+fi
+
+if [ ${#coverage_low[@]} -ne 0 ]; then
+    echo "Insufficient coverage in packages:"
+    for pkg in "${coverage_low[@]}"; do
+	echo "  $pkg"
+    done
+    exit_code=1
+fi
+
+exit "$exit_code"
