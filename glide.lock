@@ -1,28 +1,31 @@
-hash: 40ed37d11f81bed42218becc0fd515b5f8ace4d8c2036c8c807ee73ef63db939
-updated: 2017-10-29T17:32:17.818948373-07:00
+hash: 38a5690b1e73fc22773e43f236439f0aba960464b056a1edd2088639f00b78fd
+updated: 2019-10-27T17:51:56.121915-07:00
 imports:
 - name: github.com/golang/lint
-  version: c7bacac2b21ca01afa1dee0acf64df3ce047c28f
+  version: 16217165b5de779cb6a5e4fc81fa9c1166fda457
   subpackages:
   - golint
+- name: golang.org/x/lint
+  version: 16217165b5de779cb6a5e4fc81fa9c1166fda457
 - name: golang.org/x/tools
-  version: f1a397bba50dee815e8c73f3ec94ffc0e8df1a09
+  version: b2104f82a97df5456531b2816ef2022c7f4431c0
   subpackages:
-  - go/gcimporter15
+  - go/packages
 testImports:
 - name: github.com/gopherjs/gopherjs
-  version: f2fc182abb28925c7aa40502db839c6ebd7f7171
+  version: d3ddacdb130fcd23f77a827e3b599804730be6b5
   subpackages:
   - js
 - name: github.com/jtolds/gls
-  version: 8ddce2a84170772b95dd5d576c48d517b22cac63
+  version: b4936e06046bbecbb94cae9c18127ebe510a2cb9
 - name: github.com/smartystreets/assertions
-  version: 2063fd1cc7c975db70502811a34b06ad034ccdf2
+  version: 8df9578143a50c65c2675d8e3207386ca9375d31
   subpackages:
+  - internal/go-diff/diffmatchpatch
   - internal/go-render/render
   - internal/oglematchers
 - name: github.com/smartystreets/goconvey
-  version: 5db88ed452e937f2fd557de6f4f1af7f2eabed0b
+  version: 505e419363375c0dc132d3ac02632a4ee32199ca
   subpackages:
   - convey
   - convey/gotest

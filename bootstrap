@@ -25,8 +25,8 @@ echo "Root dir: ${ROOT}"
 
 # Bootstrap glide - the tool that bootstraps all the other dependencies.
 GLIDE_DIR="${ROOT}/src/vendor/github.com/Masterminds/glide"
-# For now, pin it here. Current pin: v0.13.0.
-GLIDE_SHA1="a88a9a6c4eeaac084a90a0cd2ca8a148cbd3ff63"
+# For now, pin it here. Current pin: v0.13.3.
+GLIDE_SHA1="8ed5b9292379d86c39592a7e6a58eb9c903877cf"
 
 # Automatically build and install these packages
 AUTOINSTALL_PACKAGES=( \
