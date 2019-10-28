@@ -5,7 +5,8 @@ import:
   - golint
 - package: golang.org/x/tools
   subpackages:
-  - go/gcimporter15
+  - go/packages
+- package: golang.org/x/lint
 testImport:
 - package: github.com/smartystreets/goconvey
   subpackages:
