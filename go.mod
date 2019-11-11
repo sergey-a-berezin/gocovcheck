@@ -1,9 +1,10 @@
 module github.com/sergey-a-berezin/gocovcheck
 
 replace (
-    github.com/sergey-a-berezin/gocovcheck/coverage => ./coverage
-    github.com/sergey-a-berezin/gocovcheck/jsonread => ./jsonread
+	github.com/sergey-a-berezin/gocovcheck/coverage => ./coverage
+	github.com/sergey-a-berezin/gocovcheck/jsonread => ./jsonread
 )
+
 go 1.12
 
 require (

@@ -17,9 +17,11 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "${DIR}/common.sh"
 
-cd "${ROOT}/src"
+cd "${DIR}"
 
 source "${ROOT}/bin/activate"
+
+modules=("." "./coverage" "./jsonread")
 
 COVERAGE_PROFILE=".coverage"
 COVERAGERC=".coveragerc"
@@ -28,8 +30,10 @@ MIN_COVERAGE=75
 tests_failed=()
 coverage_low=()
 rm -f "$COVERAGE_PROFILE"
-for path in $(glide novendor); do
+for path in "${modules[@]}"; do
+    echo "testing module '$path' in `pwd`"
     for pkg in $(go list "$path"); do
+	echo "testing package $pkg"
 	if ! go test -coverprofile "${COVERAGE_PROFILE}_tmp" "$pkg"; then
 	    tests_failed=("${tests_failed[@]}" "$pkg")
 	fi
@@ -54,8 +58,9 @@ if [ -f "$COVERAGE_PROFILE" ]; then
 	coverage_low=("${coverage_low[@]}" "Average across all packages")
     fi
 fi
-go vet $(glide novendor)
-golint $(glide novendor)
+echo "got here"
+go vet "${modules[@]}"
+golint "${modules[@]}"
 
 exit_code=0
 
