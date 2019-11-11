@@ -15,8 +15,8 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$DIR"
 
-PARENT_PATH="src/github.com/sergey-a-berezin/gocovcheck"
-# ${DIR} is expected to be ${ROOT}/src/github.com/sergey-a-berezin/gocovcheck
+PARENT_PATH="src/gocovcheck"
+# ${DIR} is expected to be ${ROOT}/src/gocovcheck
 
 ROOT=${DIR}
 curr_parent="${PARENT_PATH}"

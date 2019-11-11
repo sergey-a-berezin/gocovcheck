@@ -58,8 +58,8 @@ Assuming you selected the Go root for this package as `~/go/gocovcheck`, set up
 the environment as follows:
 
 ```
-mkdir -p ~/go/gocovcheck/src/github.com/sergey-a-berezin
-cd ~/go/gocovcheck/src/github.com/sergey-a-berezin
+mkdir -p ~/go/gocovcheck/src
+cd ~/go/gocovcheck/src
 git clone git@github.com:sergey-a-berezin/gocovcheck.git
 cd gocovcheck
 make init
@@ -69,10 +69,7 @@ This will:
 
 - Setup `~/go/gocovcheck/bin/activate` script for setting up your GO environment
   with the root at `~/go/gocovcheck`;
-- Download and install [`glide`](https://github.com/Masterminds/glide) into this
-  environment;
-- Download all the dependencies listed in `glide.yaml` at versions pinned in
-  `glide.lock` into the `~/go/gocovcheck/src/vendor` directory;
+- Download all the dependencies listed in `go.mod`;
 - Install `golint`, `goconvey`, `gocovcheck` and `jsonread` into the
   environment.
 
@@ -103,7 +100,7 @@ However, for iterative development, I highly recommend running an interactive
 `goconvey` session in a separate shell:
 
 ```
-cd ~/go/gocovcheck/src
+cd ~/go/gocovcheck/src/gocovcheck
 goconvey
 ```
 

@@ -24,21 +24,26 @@ all:
 	@echo "  make pristine - clean + delete everything created by bootstrap"
 
 install:
-	go install
+	(source "$(ROOT)/bin/activate"; cd "$(ROOT)/src/gocovcheck"; go install)
 
 build:
-	go build
+	(source bin/activate; cd src/gocovcheck; go build)
 
 test:
 	./runtests
 
 init:
 	./bootstrap
+	(source "$(ROOT)/bin/activate"; cd "$(ROOT)/src/gocovcheck"; \
+		go install github.com/smartystreets/goconvey; \
+		go install golang.org/x/lint/golint; \
+		go install; \
+		cd jsonread; go install)
 	@echo "Bootstrap done!"
 
 clean:
+	chmod -R u+w "$(ROOT)/pkg"
 	rm -rf "$(ROOT)/pkg" "$(ROOT)/src/.coverage"
 
 pristine: clean
-	rm -rf "$(ROOT)/bin" "$(ROOT)/src/vendor"
-	rm -f "$(ROOT)/src/glide.yaml" "$(ROOT)/src/glide.lock"
+	rm -rf "$(ROOT)/bin"
