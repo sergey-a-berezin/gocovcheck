@@ -32,7 +32,7 @@ coverage_low=()
 rm -f "$COVERAGE_PROFILE"
 for path in "${modules[@]}"; do
     echo "testing module '$path' in `pwd`"
-    for pkg in $(go list "$path"); do
+    for pkg in $(cd "$path"; go list); do
 	echo "testing package $pkg"
 	if ! go test -coverprofile "${COVERAGE_PROFILE}_tmp" "$pkg"; then
 	    tests_failed=("${tests_failed[@]}" "$pkg")
