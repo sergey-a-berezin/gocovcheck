@@ -27,7 +27,7 @@ all:
 	@echo "  make pristine - clean + delete everything created by bootstrap"
 
 install:
-	(source "$(GOPATH)/bin/activate"; go install $(INSTALLS))
+	(source "$(GOPATH)/bin/bashrc"; go install $(INSTALLS))
 
 test:
 	./runtests $(PACKAGES)

@@ -19,10 +19,10 @@
 trap 'runtests failed on line ${LINENO}"; exit 1' ERR
 
 ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+BIN="${ROOT}/gopath/bin"
 cd "${ROOT}"
 
 echo "Activating Go environment in ${ROOT}"
-source "${ROOT}/gopath/bin/bashrc"
 
 PACKAGES=($@)
 
@@ -46,7 +46,7 @@ fi
 go tool cover -html="${COVERAGE_PROFILE}" -o "${COVERAGE_HTML}"
 echo "Wrote ${ROOT}/${COVERAGE_HTML} - open in a browser to see coverage."
 if [ -f "${ROOT}/${COVERAGERC}" ]; then
-	min_coverage=`jsonread "${ROOT}/${COVERAGERC}" min_coverage "$DEFAULT_MIN_COVERAGE"`
+	min_coverage=`"${BIN}"/jsonread "${ROOT}/${COVERAGERC}" min_coverage "$DEFAULT_MIN_COVERAGE"`
 else
 	min_coverage="$DEFAULT_MIN_COVERAGE"
 fi
@@ -56,9 +56,9 @@ if ! go vet "${PACKAGES[@]}"; then
 fi
 # golint returns code 0 even when it fails. We'd have to check its output,
 # and run it again to print warnings to stdout.
-if [[ ! -z $(golint "${PACKAGES[@]}") ]] ; then
+if [[ ! -z $("${BIN}/"golint "${PACKAGES[@]}") ]] ; then
 	code_warnings=("${code_warnings[@]}" "golint has warnings")
-	golint "${PACKAGES[@]}"
+	"${BIN}"/golint "${PACKAGES[@]}"
 fi
 if [ ! -z $(gofmt -l -s "${PACKAGES[@]}") ]; then
 	echo "WARNING: the following files are not formatted correctly:"
@@ -68,7 +68,7 @@ if [ ! -z $(gofmt -l -s "${PACKAGES[@]}") ]; then
 fi
 
 if [ -f "$COVERAGE_PROFILE" ]; then
-    if ! gocovcheck "$COVERAGE_PROFILE" "$min_coverage"; then
+    if ! "${BIN}"/gocovcheck "$COVERAGE_PROFILE" "$min_coverage"; then
 	coverage_low=1
     fi
 fi
