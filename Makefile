@@ -12,38 +12,44 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-ROOT := $(shell source ./common.sh; echo "$${ROOT}")
+GOPATH=gopath
+PACKAGES=./coverage ./gitbasedversion ./jsonread ./gocovcheck
+INSTALLS=./gocovcheck ./jsonread
 
 all:
 	@echo "Please pick a target:"
-	@echo "  make build    - compile (but do not install) the package"
-	@echo "  make install  - compile and install gocovcheck executable"
+	@echo "  make install  - compile and install gocovcheck executables"
 	@echo "  make init     - initialize the development environment"
 	@echo "  make test     - run tests"
+	@echo "  make gofmt     - format all *.go files"
+	@echo "  make goconvey  - start a goconvey session (Crtl-C to exit)"
 	@echo "  make clean    - delete object files and other temporary files"
 	@echo "  make pristine - clean + delete everything created by bootstrap"
 
 install:
-	(source "$(ROOT)/bin/activate"; cd "$(ROOT)/src/gocovcheck"; go install)
-
-build:
-	(source bin/activate; cd src/gocovcheck; go build)
+	(source "$(GOPATH)/bin/activate"; go install $(INSTALLS))
 
 test:
-	./runtests
+	./runtests $(PACKAGES)
 
 init:
 	./bootstrap
-	(source "$(ROOT)/bin/activate"; cd "$(ROOT)/src/gocovcheck"; \
+	(source "$(GOPATH)/bin/bashrc"; \
 		go install github.com/smartystreets/goconvey; \
 		go install golang.org/x/lint/golint; \
-		go install; \
-		cd jsonread; go install)
+		go install $(INSTALLS))
 	@echo "Bootstrap done!"
 
+gofmt:
+	/bin/bash -c "source $(GOPATH)/bin/bashrc && gofmt -s -w $(PACKAGES)"
+
+goconvey:
+	/bin/bash -c "source $(GOPATH)/bin/bashrc; goconvey -excludedDirs gopath"
+
 clean:
-	chmod -R u+w "$(ROOT)/pkg"
-	rm -rf "$(ROOT)/pkg" "$(ROOT)/src/.coverage"
+	rm -f ".coverage"
+	rm -f "coverage.html"
 
 pristine: clean
-	rm -rf "$(ROOT)/bin"
+	chmod -R u+w "$(GOPATH)/pkg"
+	rm -rf "$(GOPATH)"

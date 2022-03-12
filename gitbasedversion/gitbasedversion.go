@@ -28,6 +28,7 @@ import (
 	"os/exec"
 )
 
+// Version creates a version string based on `git log` output.
 func Version(r io.Reader) string {
 	scanner := bufio.NewScanner(r)
 	latestHash := ""

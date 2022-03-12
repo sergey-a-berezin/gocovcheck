@@ -8,9 +8,8 @@ See the [`runtests`](runtests) script in this repo for a example use of
 ## Installation
 
 ```
-go get github.com/sergey-a-berezin/gocovcheck
-go install github.com/sergey-a-berezin/gocovcheck
-go install github.com/sergey-a-berezin/gocovcheck/jsonread
+go install github.com/sergey-a-berezin/gocovcheck/gocovcheck@latest
+go install github.com/sergey-a-berezin/gocovcheck/jsonread@latest
 ```
 
 ## Usage
@@ -53,13 +52,7 @@ The following describes the intended development environment and workflow for
 
 ### Setting up developer environment
 
-This package assumes it has its own Go source tree, separate from anything else.
-Assuming you selected the Go root for this package as `~/go/gocovcheck`, set up
-the environment as follows:
-
 ```
-mkdir -p ~/go/gocovcheck/src
-cd ~/go/gocovcheck/src
 git clone git@github.com:sergey-a-berezin/gocovcheck.git
 cd gocovcheck
 make init
@@ -67,25 +60,18 @@ make init
 
 This will:
 
-- Setup `~/go/gocovcheck/bin/activate` script for setting up your GO environment
-  with the root at `~/go/gocovcheck`;
+- Setup `gopath/bin/activate` script for setting up your Go environment with
+  `GOPATH=<abs.path>/gopath;`
 - Download all the dependencies listed in `go.mod`;
 - Install `golint`, `goconvey`, `gocovcheck` and `jsonread` into the
   environment.
 
 Now you can run:
 
-    source ~/go/gocovcheck/bin/activate
+    ./gopath/binactivate
 
-and your current shell will be setup for the new Go environment, with `$GOPATH`
-set to `~/go/gocovcheck`. You can deactivate this environment and return to your
-default Go setup (if any) by running:
-
-    deactivate
-
-Note: go environments are not recursive. By entering a second Go environment
-this way, your shell will effectively forget the original setup, and you may
-have to quit and restart your terminal (or shell) to restore the defaults.
+This starts a new shell with the Go environment. To deactivate, exit the shell:
+`exit` or `<Ctrl-D>`.
 
 ### Running tests
 
@@ -97,17 +83,17 @@ This command is good for automated tests, e.g. if you have a continuous
 integration setup, and for a summary of the total test coverage.
 
 However, for iterative development, I highly recommend running an interactive
-`goconvey` session in a separate shell:
+`goconvey` session:
 
 ```
-cd ~/go/gocovcheck/src/gocovcheck
-goconvey
+make goconvey
 ```
 
-This command will block (hence a separate shell) and open a browser window
-visualizing all of your tests. Modifying a source file will rerun all the tests
-and update the web page automatically. This way, you can just write your code as
-usual, and immediately know if the code compiles and/or passes tests.
+This command will block (so it's best to run it in a separate shell) and open a
+browser window visualizing all of your tests. Modifying a source file will rerun
+all the tests and update the web page automatically. This way, you can just
+write your code as usual, and immediately know if the code compiles and/or
+passes tests.
 
 ### Contributing to `gocovcheck`
 
