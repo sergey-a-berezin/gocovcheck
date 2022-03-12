@@ -66,9 +66,11 @@ This will:
 - Install `golint`, `goconvey`, `gocovcheck` and `jsonread` into the
   environment.
 
-Now you can run:
+Now you can run
 
-    ./gopath/binactivate
+```
+./gopath/bin/activate
+```
 
 This starts a new shell with the Go environment. To deactivate, exit the shell:
 `exit` or `<Ctrl-D>`.
@@ -77,7 +79,9 @@ This starts a new shell with the Go environment. To deactivate, exit the shell:
 
 A quick command line to run the tests:
 
-    make test
+```
+make test
+```
 
 This command is good for automated tests, e.g. if you have a continuous
 integration setup, and for a summary of the total test coverage.
