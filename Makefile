@@ -27,18 +27,23 @@ all:
 	@echo "  make pristine - clean + delete everything created by bootstrap"
 
 install:
-	(source "$(GOPATH)/bin/activate"; go install $(INSTALLS))
+	(source "$(GOPATH)/bin/bashrc"; go install $(INSTALLS))
 
 test:
 	./runtests $(PACKAGES)
 
-init:
-	./bootstrap
-	(source "$(GOPATH)/bin/bashrc"; \
-		go install github.com/smartystreets/goconvey; \
-		go install golang.org/x/lint/golint; \
-		go install $(INSTALLS))
+init: $(GOPATH)/bin/bashrc $(GOPATH)/bin/goconvey $(GOPATH)/bin/golint
+	/bin/bash -c "source $(GOPATH)/bin/bashrc && go install $(INSTALLS)"
 	@echo "Bootstrap done!"
+
+$(GOPATH)/bin/bashrc:
+	./bootstrap
+
+$(GOPATH)/bin/goconvey:
+	/bin/bash -c "source $(GOPATH)/bin/bashrc && go install github.com/smartystreets/goconvey"
+
+$(GOPATH)/bin/golint:
+	/bin/bash -c "source $(GOPATH)/bin/bashrc && go install golang.org/x/lint/golint"
 
 gofmt:
 	/bin/bash -c "source $(GOPATH)/bin/bashrc && gofmt -s -w $(PACKAGES)"
