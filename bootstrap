@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright 2017 Sergey Berezin
+# Copyright 2022 Sergey Berezin
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,14 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 # Stop the script on the first error.
 trap 'bootstrap failed on line ${LINENO}"; exit 1' ERR
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source "${DIR}/common.sh"
+GOPATH="${DIR}/gopath"
 
 echo "Current dir: ${DIR}"
-echo "Root dir: ${ROOT}"
+echo "GOPATH dir: ${GOPATH}"
 
 if ! which go > /dev/null; then
     echo "  WARNING: Couldn't find Go installation."
@@ -29,69 +30,25 @@ if ! which go > /dev/null; then
     exit 1
 fi
 
-mkdir -p "${ROOT}/bin" "${ROOT}/pkg"
+mkdir -p "${GOPATH}/bin" "${GOPATH}/pkg"
 
-# Create bin/activate for Go environment, similar to Python's virtualenv.
-cat <<EOF > "${ROOT}/bin/activate"
-deactivate () {
-    if [ -n "\$_OLD_GOENV_GOPATH" ]; then
-	if [ "\$_OLD_GOENV_GOPATH" = "unset" ]; then
-	    unset GOPATH
-	else
-	    GOPATH="\$_OLD_GOENV_GOPATH"
-	    export GOPATH
-	fi
-        unset _OLD_GOENV_GOPATH
-    fi
-    if [ -n "\$_OLD_GOENV_PATH" ]; then
-	PATH="\$_OLD_GOENV_PATH"
-	export PATH
-	unset _OLD_GOENV_PATH
-    fi
-    if [ -n "\$_OLD_GOENV_GO111MODULE" ]; then
-	if [ "\$_OLD_GOENV_GO111MODULE" = "unset" ]; then
-	    unset GO111MODULE
-	else
-	    GO111MODULE="\$_OLD_GOENV_GO111MODULE"
-	    export GO111MODULE
-	fi
-        unset _OLD_GOENV_GO111MODULE
-    fi
-    # Restore shell prompt
-    if [ -n "\$_OLD_GOENV_PS1" ]; then
-	PS1="\$_OLD_GOENV_PS1"
-	export PS1
-	unset _OLD_GOENV_PS1
-    fi
-    if [ ! "\$1" = "nondestructive" ] ; then
-	# Self destruct!
-        unset -f deactivate
-    fi
-}
-
-if [ -n "\$GOPATH" ]; then
-    _OLD_GOENV_GOPATH="\$GOPATH"
-else
-    _OLD_GOENV_GOPATH="unset"
+# Create bin/bashrc and bin/activate for setting up a Go environment.
+cat <<EOF > "${GOPATH}/bin/bashrc"
+if [ -f "\${HOME}/.bashrc" ]; then
+   . "\${HOME}/.bashrc"
 fi
-export _OLD_GOENV_GO111MODULE
-if [ -n "\$GO111MODULE" ]; then
-    _OLD_GOENV_GO111MODULE="\$GO111MODULE"
-else
-    _OLD_GOENV_GO111MODULE="unset"
-fi
-export _OLD_GOENV_GO111MODULE
-_OLD_GOENV_PATH="\$PATH"
-export _OLD_GOENV_PATH
-_OLD_GOENV_PS1="\$PS1"
-export _OLD_GOENV_PS1
-
-GOPATH="$ROOT"
+GOPATH="$GOPATH"
 export GOPATH
-GO111MODULE="on"
-export GO111MODULE
-PATH="$ROOT/bin":"\$PATH"
+PATH="$GOPATH/bin":"\$PATH"
 export PATH
 PS1="(go) \$PS1"
 export PS1
 EOF
+
+cat <<EOF > "${GOPATH}/bin/activate"
+#!/bin/bash
+
+bash --rcfile "${GOPATH}/bin/bashrc"
+EOF
+
+chmod u+x "${GOPATH}/bin/activate"
