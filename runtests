@@ -57,15 +57,12 @@ if ! staticcheck ./...; then
 	code_warnings=("${code_warnings[@]}" "staticcheck has warnings")
 fi
 
-echo "Passed staticcheck"
 if [[ ! -z $(gofmt -l -s .) ]]; then
 	echo "WARNING: the following files are not formatted correctly:"
 	gofmt -l -s .
 	echo "Please run 'make gofmt'."
 	code_warnings=("${code_warnings[@]}" "need to run 'make gofmt'")
 fi
-
-echo "Passed gofmt"
 
 if [ -f "$COVERAGE_PROFILE" ]; then
     if ! gocovcheck "$COVERAGE_PROFILE" "$min_coverage"; then
