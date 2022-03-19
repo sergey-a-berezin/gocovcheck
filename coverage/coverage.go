@@ -33,7 +33,7 @@ func parseLine(line string) (total, covered uint64, err error) {
 	switch len(parts) {
 	case 2:
 		if line != "mode: set" {
-			err = fmt.Errorf("Failed to parse line: unsupported mode: %s", line)
+			err = fmt.Errorf("failed to parse line: unsupported mode: %s", line)
 		}
 	case 3:
 		total, err = strconv.ParseUint(parts[1], 10, 64)
@@ -45,7 +45,7 @@ func parseLine(line string) (total, covered uint64, err error) {
 			covered = total
 		}
 	default:
-		err = fmt.Errorf("Failed to parse line: unrecognized format: %s", line)
+		err = fmt.Errorf("failed to parse line: unrecognized format: %s", line)
 	}
 	return
 }
