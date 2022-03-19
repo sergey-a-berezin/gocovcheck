@@ -14,17 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 # Stop the script on the first error.
-trap 'runtests failed on line ${LINENO}"; exit 1' ERR
+trap 'echo "runtests failed on line ${LINENO}"; exit 1' ERR
 
 ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-BIN="${ROOT}/gopath/bin"
 cd "${ROOT}"
 
-echo "Activating Go environment in ${ROOT}"
-
-PACKAGES=($@)
+GOPATH=`go env GOPATH`
+PATH="${GOPATH}/bin:${PATH}"
+export PATH
 
 echo "GOROOT: `go env GOROOT`"
 echo "GOPATH: `go env GOPATH`"
@@ -40,35 +38,37 @@ code_warnings=()
 rm -f "$COVERAGE_PROFILE"
 GOTEST_ARGS=()
 
-if ! go test -coverprofile "${COVERAGE_PROFILE}" "${GOTEST_ARGS[@]}" "${PACKAGES[@]}"; then
+if ! go test -coverprofile "${COVERAGE_PROFILE}" "${GOTEST_ARGS[@]}" ./...; then
 	tests_failed=1
 fi
 go tool cover -html="${COVERAGE_PROFILE}" -o "${COVERAGE_HTML}"
 echo "Wrote ${ROOT}/${COVERAGE_HTML} - open in a browser to see coverage."
 if [ -f "${ROOT}/${COVERAGERC}" ]; then
-	min_coverage=`"${BIN}"/jsonread "${ROOT}/${COVERAGERC}" min_coverage "$DEFAULT_MIN_COVERAGE"`
+	min_coverage=`jsonread "${ROOT}/${COVERAGERC}" min_coverage "$DEFAULT_MIN_COVERAGE"`
 else
 	min_coverage="$DEFAULT_MIN_COVERAGE"
 fi
 
-if ! go vet "${PACKAGES[@]}"; then
+if ! go vet ./...; then
 	code_warnings=("${code_warnings[@]}" "go vet has warnings")
 fi
-# golint returns code 0 even when it fails. We'd have to check its output,
-# and run it again to print warnings to stdout.
-if [[ ! -z $("${BIN}/"golint "${PACKAGES[@]}") ]] ; then
-	code_warnings=("${code_warnings[@]}" "golint has warnings")
-	"${BIN}"/golint "${PACKAGES[@]}"
+
+if ! staticcheck ./...; then
+	code_warnings=("${code_warnings[@]}" "staticcheck has warnings")
 fi
-if [ ! -z $(gofmt -l -s "${PACKAGES[@]}") ]; then
+
+echo "Passed staticcheck"
+if [[ ! -z $(gofmt -l -s .) ]]; then
 	echo "WARNING: the following files are not formatted correctly:"
 	gofmt -l -s .
 	echo "Please run 'make gofmt'."
 	code_warnings=("${code_warnings[@]}" "need to run 'make gofmt'")
 fi
 
+echo "Passed gofmt"
+
 if [ -f "$COVERAGE_PROFILE" ]; then
-    if ! "${BIN}"/gocovcheck "$COVERAGE_PROFILE" "$min_coverage"; then
+    if ! gocovcheck "$COVERAGE_PROFILE" "$min_coverage"; then
 	coverage_low=1
     fi
 fi

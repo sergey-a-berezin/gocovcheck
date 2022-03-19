@@ -12,9 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-GOPATH=gopath
-PACKAGES=./coverage ./gitbasedversion ./jsonread ./gocovcheck
-INSTALLS=./gocovcheck ./jsonread
+INSTALLS=. ./jsonread
+GOPATH=$(shell go env GOPATH)
 
 all:
 	@echo "Please pick a target:"
@@ -23,38 +22,26 @@ all:
 	@echo "  make test     - run tests"
 	@echo "  make gofmt     - format all *.go files"
 	@echo "  make goconvey  - start a goconvey session (Crtl-C to exit)"
-	@echo "  make clean    - delete object files and other temporary files"
-	@echo "  make pristine - clean + delete everything created by bootstrap"
+	@echo "  make clean    - delete generated files"
 
 install:
-	(source "$(GOPATH)/bin/bashrc"; go install $(INSTALLS))
+	go install $(INSTALLS)
 
 test:
-	./runtests $(PACKAGES)
+	./runtests
 
-init: $(GOPATH)/bin/bashrc $(GOPATH)/bin/goconvey $(GOPATH)/bin/golint
-	/bin/bash -c "source $(GOPATH)/bin/bashrc && go install $(INSTALLS)"
+init:
+	go install github.com/smartystreets/goconvey@v1.7.2
+	go install honnef.co/go/tools/cmd/staticcheck@2021.1.2
+	go install $(INSTALLS)
 	@echo "Bootstrap done!"
 
-$(GOPATH)/bin/bashrc:
-	./bootstrap
-
-$(GOPATH)/bin/goconvey:
-	/bin/bash -c "source $(GOPATH)/bin/bashrc && go install github.com/smartystreets/goconvey"
-
-$(GOPATH)/bin/golint:
-	/bin/bash -c "source $(GOPATH)/bin/bashrc && go install golang.org/x/lint/golint"
-
 gofmt:
-	/bin/bash -c "source $(GOPATH)/bin/bashrc && gofmt -s -w $(PACKAGES)"
+	gofmt -s -w .
 
 goconvey:
-	/bin/bash -c "source $(GOPATH)/bin/bashrc; goconvey -excludedDirs gopath"
+	$(GOPATH)/bin/goconvey
 
 clean:
 	rm -f ".coverage"
 	rm -f "coverage.html"
-
-pristine: clean
-	chmod -R u+w "$(GOPATH)/pkg"
-	rm -rf "$(GOPATH)"
